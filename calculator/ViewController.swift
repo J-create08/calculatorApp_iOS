@@ -10,6 +10,14 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet var holder: UIView!
+    
+    var firstNumber = 0
+    var resultNumber = 0
+    var currentOperations: Operation?
+    
+    enum Operation {
+        case add, substract, multiply, divide
+    }
     private var resultLabel: UILabel = {
         let label = UILabel()
         label.text = "0"
@@ -36,6 +44,7 @@ class ViewController: UIViewController {
         zeroButton.backgroundColor = .white
         zeroButton.setTitle("0", for: .normal)
         zeroButton.tag = 1
+        zeroButton.addTarget(self, action: #selector(zeroTapped), for: .touchUpInside)
         holder.addSubview(zeroButton)
         
         for x in 0..<3{
@@ -81,6 +90,8 @@ class ViewController: UIViewController {
             button4.setTitleColor(.white, for: .normal)
             button4.backgroundColor = .orange
             button4.setTitle(operations[x], for: .normal)
+            button4.addTarget(self, action: #selector(operationPressed(_:)), for: .touchUpInside)
+            button4.tag = x+1
             holder.addSubview(button4)
         }
         
@@ -93,6 +104,18 @@ class ViewController: UIViewController {
     
     @objc func clearResult(){
         resultLabel.text = "0"
+        currentOperations = nil
+        firstNumber = 0
+    }
+    
+    @objc func zeroTapped(_ sender: UIButton){
+        
+        if resultLabel.text != "0" {
+            if let text = resultLabel.text {
+            resultLabel.text = "\(text)\(0)"
+        }
+
+    }
     }
     
     @objc func numberPressed(_ sender: UIButton){
@@ -104,6 +127,60 @@ class ViewController: UIViewController {
         else if let text = resultLabel.text {
             resultLabel.text = "\(text)\(tag)"
         }
+        
+    }
+    
+    @objc func operationPressed(_ sender: UIButton){
+        let tag = sender.tag
+        
+        if let text = resultLabel.text, let value = Int(text), firstNumber == 0 {
+            firstNumber = value
+            resultLabel.text = "0"
+        }
+        
+        if tag == 1 {
+            if let operation = currentOperations{
+                var secondNumber = 0
+                if let text = resultLabel.text, let value = Int(text) {
+                    secondNumber = value
+                }
+                switch operation {
+                case .add:
+                    
+                    let result = firstNumber + secondNumber
+                    resultLabel.text = "\(result)"
+                    break
+                case .substract:
+                    
+                    let result = firstNumber - secondNumber
+                    resultLabel.text = "\(result)"
+                    break
+                case .multiply:
+                    
+                    let result = firstNumber * secondNumber
+                    resultLabel.text = "\(result)"
+                    break
+                case .divide:
+                    
+                    let result = firstNumber / secondNumber
+                    resultLabel.text = "\(result)"
+                    break
+                }
+            }
+        }
+        else if tag == 2{
+            currentOperations = .add
+        }
+        else if tag == 3{
+            currentOperations = .substract
+        }
+        else if tag == 4{
+            currentOperations = .multiply
+        }
+        else if tag == 5{
+            currentOperations = .divide
+        }
+        
     }
 
 
